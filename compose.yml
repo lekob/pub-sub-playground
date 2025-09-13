@@ -15,13 +15,20 @@ services:
         build: ./results-service
         environment:
             RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+            REDIS_URL: redis:6379
             PORT: 8081
         ports:
             - "8081:8081"
         depends_on:
             - rabbitmq
+            - redis
 
     rabbitmq:
         image: rabbitmq:3.13-management
         ports:
             - "127.0.0.1:15672:15672"
+
+    redis:
+        image: redis:7-alpine
+        ports:
+            - "127.0.0.1:6379:6379"
