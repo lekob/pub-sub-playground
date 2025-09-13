@@ -10,6 +10,14 @@ services:
         depends_on:
             - rabbitmq
 
+    worker:
+        image: lekob/worker
+        build: ./worker-service
+        environment:
+            RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+        depends_on:
+            - rabbitmq
+
     rabbitmq:
         image: rabbitmq:3.13-management
         ports:
