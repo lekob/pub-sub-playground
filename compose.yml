@@ -1,0 +1,16 @@
+services:
+    polling:
+        image: lekob/polling
+        build: ./polling-service
+        environment:
+            RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+            PORT: 8080
+        ports:
+            - "8080:8080"
+        depends_on:
+            - rabbitmq
+
+    rabbitmq:
+        image: rabbitmq:3.13-management
+        ports:
+            - "127.0.0.1:15672:15672"
