@@ -1,7 +1,9 @@
 services:
     polling:
         image: lekob/polling
-        build: ./polling-service
+        build:
+            context: .
+            dockerfile: ./polling-service/Dockerfile
         environment:
             RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
             PORT: 8080
@@ -12,7 +14,9 @@ services:
 
     results:
         image: lekob/results
-        build: ./results-service
+        build:
+            context: .
+            dockerfile: ./results-service/Dockerfile
         environment:
             RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
             REDIS_URL: redis:6379
