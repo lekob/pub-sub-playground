@@ -18,6 +18,17 @@ services:
         depends_on:
             - rabbitmq
 
+    results:
+        image: lekob/results
+        build: ./results-service
+        environment:
+            RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+            PORT: 8081
+        ports:
+            - "8081:8081"
+        depends_on:
+            - rabbitmq
+
     rabbitmq:
         image: rabbitmq:3.13-management
         ports:
