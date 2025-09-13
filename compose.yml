@@ -10,14 +10,6 @@ services:
         depends_on:
             - rabbitmq
 
-    worker:
-        image: lekob/worker
-        build: ./worker-service
-        environment:
-            RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
-        depends_on:
-            - rabbitmq
-
     results:
         image: lekob/results
         build: ./results-service
