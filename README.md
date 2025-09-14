@@ -63,9 +63,9 @@ curl -X POST -H "Content-Type: application/json" -d '{"option": "go"}' http://lo
 
 ### Viewing Results
 
-There are two ways to view the results:
+There are three ways to view the results:
 
-1.  **HTTP Endpoint**: Get the current results by sending a `GET` request to the `results-service`.
+1. **HTTP Endpoint**: Get the current results by sending a `GET` request to the `results-service`.
 
     **Endpoint**: `http://localhost:8081/results`
 
@@ -81,7 +81,7 @@ There are two ways to view the results:
     }
     ```
 
-2.  **Real-Time Updates via WebSocket**: Connect to the WebSocket endpoint to receive real-time updates as votes are cast.
+2. **Real-Time Updates via WebSocket**: Connect to the WebSocket endpoint to receive real-time updates as votes are cast.
 
     **Endpoint**: `ws://localhost:8081/ws`
 
@@ -92,3 +92,14 @@ There are two ways to view the results:
     ```
 
     Each time a vote is cast, you will receive a message with the updated vote counts.
+
+3. **Web Interface**: Open the `index.html` file in your browser to view the results in real-time with a user-friendly interface.
+
+    - The web interface connects to the WebSocket endpoint (`ws://localhost:8081/ws`) to display real-time updates.
+    - To use the interface, simply open the `index.html` file in your browser:
+
+      ```bash
+      xdg-open index.html
+      ```
+
+    - The interface will automatically connect to the WebSocket server and display the poll results dynamically.
