@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Polling Service",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "remotePath": "/app",
+            "port": 40000,
+            "host": "127.0.0.1",
+            "substitutePath": [
+                {
+                    "from": "${workspaceFolder}/polling-service",
+                    "to": "/app/polling-service"
+                },
+                {
+                    "from": "${workspaceFolder}/common",
+                    "to": "/app/common"
+                }
+            ]
+        },
+        {
+            "name": "Attach to Results Service",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "remotePath": "/app",
+            "port": 40001,
+            "host": "127.0.0.1",
+            "substitutePath": [
+                {
+                    "from": "${workspaceFolder}/results-service",
+                    "to": "/app/results-service"
+                },
+                {
+                    "from": "${workspaceFolder}/common",
+                    "to": "/app/common"
+                }
+            ]
+        }
+    ]
+}

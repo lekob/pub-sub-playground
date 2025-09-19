@@ -1,0 +1,37 @@
+services:
+    polling:
+        build:
+            target: development
+        ports:
+            - "40000:40000" # Delve debugger port
+        security_opt:
+            - "seccomp=unconfined" # Add security option needed for Delve
+        cap_add:
+            - SYS_PTRACE
+        # Mount the whole repository into /app so module replace directives like ../common work
+        volumes:
+            - ./:/app:rw
+        working_dir: /app/polling-service
+
+    results:
+        build:
+            target: development
+        ports:
+            - "40001:40000" # Delve debugger port
+        security_opt:
+            - "seccomp=unconfined" # Add security option needed for Delve
+        cap_add:
+            - SYS_PTRACE
+        # Mount the whole repository into /app so module replace directives like ../common work
+        volumes:
+            - ./:/app:rw
+        working_dir: /app/results-service
+
+    rabbitmq:
+        image: rabbitmq:3.13-management
+        ports:
+            - "127.0.0.1:15672:15672"
+
+    redis:
+        ports:
+            - "127.0.0.1:6379:6379"

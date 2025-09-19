@@ -4,6 +4,7 @@ services:
         build:
             context: .
             dockerfile: ./polling-service/Dockerfile
+            target: production
         environment:
             RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
             PORT: 8080
@@ -17,6 +18,7 @@ services:
         build:
             context: .
             dockerfile: ./results-service/Dockerfile
+            target: production
         environment:
             RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
             REDIS_URL: redis:6379
@@ -28,11 +30,7 @@ services:
             - redis
 
     rabbitmq:
-        image: rabbitmq:3.13-management
-        ports:
-            - "127.0.0.1:15672:15672"
+        image: rabbitmq:3.13
 
     redis:
         image: redis:7-alpine
-        ports:
-            - "127.0.0.1:6379:6379"
