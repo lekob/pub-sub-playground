@@ -31,10 +31,10 @@ To run the application, you need to have Docker and Docker Compose installed.
     cd pub-sub-playground
     ```
 
-2.  Build and run the services using Docker Compose:
+2.  Build and run the services:
 
     ```bash
-    docker compose up --build -d
+    make
     ```
 
 ## Usage
