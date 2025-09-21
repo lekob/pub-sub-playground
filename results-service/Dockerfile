@@ -25,4 +25,4 @@ EXPOSE 8080
 EXPOSE 40000
 
 # Default command runs delve in headless mode, listening on 0.0.0.0:40000 and waiting for a debugger client.
-CMD ["dlv", "debug", "--headless", "--listen=0.0.0.0:40000", "--api-version=2", "--accept-multiclient"]
+CMD ["dlv", "debug", "--headless", "--listen=0.0.0.0:40000", "--api-version=2", "--accept-multiclient", "--continue"]
