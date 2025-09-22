@@ -3,13 +3,13 @@ WORKDIR /app
 COPY . .
 WORKDIR /app/polling-service
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/polling-service .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/polling-service/service .
 
 FROM alpine:latest AS production
 WORKDIR /app
-COPY --from=builder /app/polling-service .
+COPY --from=builder /app/polling-service/service .
 EXPOSE 8080
-CMD ["./polling-service"]
+CMD ["./service"]
 
 FROM golang:1.24-alpine AS development
 WORKDIR /app
