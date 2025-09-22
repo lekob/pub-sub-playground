@@ -37,6 +37,17 @@ To run the application, you need to have Docker and Docker Compose installed.
     make
     ```
 
+## Shared Dockerfile
+
+This repository uses a single multi-stage Dockerfile for both `polling-service` and `results-service`.
+
+To build a specific service with Docker directly, pass the `SERVICE_DIR` build-arg, for example:
+
+```bash
+docker build --build-arg SERVICE_DIR=polling-service .
+docker build --build-arg SERVICE_DIR=results-service .
+```
+
 ## Usage
 
 ### Casting a Vote
