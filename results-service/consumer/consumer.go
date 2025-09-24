@@ -6,28 +6,24 @@ import (
 	"log"
 	"os"
 
-	"poll/common/rabbitmq"
 	"results-service/hub"
 	"results-service/store"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Consumer struct {
 	store *store.Store
 	hub   *hub.Hub
+	conn  *amqp.Connection
 }
 
-func New(s *store.Store, h *hub.Hub) *Consumer {
-	return &Consumer{store: s, hub: h}
+func New(s *store.Store, h *hub.Hub, c *amqp.Connection) *Consumer {
+	return &Consumer{store: s, hub: h, conn: c}
 }
 
 func (c *Consumer) Start() {
-	conn, err := rabbitmq.Connect()
-	if err != nil {
-		log.Fatalf("Could not connect to RabbitMQ: %s", err)
-	}
-	defer conn.Close()
-
-	ch, err := conn.Channel()
+	ch, err := c.conn.Channel()
 	if err != nil {
 		log.Fatalf("Failed to open a channel: %s", err)
 	}

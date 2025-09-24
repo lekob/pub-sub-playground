@@ -14,6 +14,7 @@ import (
 	"results-service/hub"
 	"results-service/store"
 
+	"poll/common/rabbitmq"
 	"poll/common/redis"
 )
 
@@ -23,12 +24,13 @@ func main() {
 	defer redisClient.Close()
 
 	// Initialize components
+	amqp := rabbitmq.Connect()
 	voteStore := store.New(redisClient)
 	wsHub := hub.New()
 	go wsHub.Run()
 
 	// Start the RabbitMQ consumer
-	voteConsumer := consumer.New(voteStore, wsHub)
+	voteConsumer := consumer.New(voteStore, wsHub, amqp)
 	go voteConsumer.Start()
 
 	// Initialize handlers

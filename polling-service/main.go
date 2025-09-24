@@ -15,10 +15,7 @@ import (
 
 func main() {
 	// Connect to RabbitMQ.
-	conn, err := rabbitmq.Connect()
-	if err != nil {
-		log.Fatalf("Could not connect to RabbitMQ: %s", err)
-	}
+	conn := rabbitmq.Connect()
 	defer conn.Close()
 
 	// Set up RabbitMQ channel and queue.
