@@ -27,19 +27,18 @@ func main() {
 	wsHub := hub.New()
 	go wsHub.Run()
 
-	// Initialize handlers
-	resultsHandler := handlers.NewResultsHandler(voteStore)
-	wsHandler := handlers.NewWebSocketHandler(wsHub, voteStore)
-
 	// Start the RabbitMQ consumer
 	voteConsumer := consumer.New(voteStore, wsHub)
 	go voteConsumer.Start()
 
-	// Set up HTTP server
-	server := &http.Server{}
+	// Initialize handlers
+	resultsHandler := handlers.NewResultsHandler(voteStore)
+	wsHandler := handlers.NewWebSocketHandler(wsHub, voteStore)
 	http.Handle("/results", resultsHandler)
 	http.Handle("/ws", wsHandler)
 
+	// Set up HTTP server
+	server := &http.Server{}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8081"
