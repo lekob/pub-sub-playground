@@ -14,24 +14,13 @@ import (
 	"results-service/hub"
 	"results-service/store"
 
-	"github.com/go-redis/redis/v8"
+	"poll/common/redis"
 )
 
 func main() {
 	// Initialize Redis client
-	redisURL := os.Getenv("REDIS_URL")
-	if redisURL == "" {
-		redisURL = "localhost:6379"
-	}
-	redisClient := redis.NewClient(&redis.Options{
-		Addr: redisURL,
-	})
+	redisClient := redis.Connect()
 	defer redisClient.Close()
-
-	if err := redisClient.Ping(context.Background()).Err(); err != nil {
-		log.Fatalf("Could not connect to Redis: %s", err)
-	}
-	log.Println("Successfully connected to Redis")
 
 	// Initialize components
 	voteStore := store.New(redisClient)
