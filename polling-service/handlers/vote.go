@@ -47,5 +47,5 @@ func (h *VoteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Published vote for option: %s", vote.Option)
 	w.WriteHeader(http.StatusAccepted)
-	w.Write([]byte("Vote cast successfully!"))
+	w.Write([]byte("Vote cast successfully!\n"))
 }
