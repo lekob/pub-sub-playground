@@ -14,15 +14,15 @@ type Vote struct {
 }
 
 type VoteHandler struct {
-	RabbitMQChannel *amqp.Channel
-	ChannelMutex    sync.Mutex
-	RabbitMQQueue   string
+	rabbitMQChannel *amqp.Channel
+	channelMutex    sync.Mutex
+	rabbitMQQueue   string
 }
 
 func NewVoteHandler(ch *amqp.Channel, queue string) *VoteHandler {
 	return &VoteHandler{
-		RabbitMQChannel: ch,
-		RabbitMQQueue:   queue,
+		rabbitMQChannel: ch,
+		rabbitMQQueue:   queue,
 	}
 }
 
@@ -43,12 +43,12 @@ func (h *VoteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.ChannelMutex.Lock()
-	defer h.ChannelMutex.Unlock()
+	h.channelMutex.Lock()
+	defer h.channelMutex.Unlock()
 
-	err := h.RabbitMQChannel.Publish(
+	err := h.rabbitMQChannel.Publish(
 		"",
-		h.RabbitMQQueue,
+		h.rabbitMQQueue,
 		false,
 		false,
 		amqp.Publishing{
