@@ -15,8 +15,8 @@ type Vote struct {
 
 type VoteHandler struct {
 	rabbitMQChannel *amqp.Channel
-	channelMutex    sync.Mutex
 	rabbitMQQueue   string
+	channelMutex    sync.Mutex
 }
 
 func NewVoteHandler(ch *amqp.Channel, queue string) *VoteHandler {
