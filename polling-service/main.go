@@ -45,7 +45,7 @@ func main() {
 
 	// Set up services and handlers
 	server := &http.Server{}
-	voteService := services.NewVoteService(ch, queueName)
+	voteService := services.NewAmqpVoteCaster(ch, queueName)
 	voteHandler := handlers.NewVoteHandler(voteService)
 	http.Handle("/vote", voteHandler)
 

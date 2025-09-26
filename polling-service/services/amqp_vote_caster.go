@@ -6,20 +6,20 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type VoteService struct {
+type AmqpVoteCaster struct {
 	amqpChannel  *amqp.Channel
 	amqpQueue    string
 	channelMutex sync.Mutex
 }
 
-func NewVoteService(ch *amqp.Channel, queue string) *VoteService {
-	return &VoteService{
+func NewAmqpVoteCaster(ch *amqp.Channel, queue string) *AmqpVoteCaster {
+	return &AmqpVoteCaster{
 		amqpChannel: ch,
 		amqpQueue:   queue,
 	}
 }
 
-func (s *VoteService) CastVote(option string) error {
+func (s *AmqpVoteCaster) CastVote(option string) error {
 	s.channelMutex.Lock()
 	defer s.channelMutex.Unlock()
 

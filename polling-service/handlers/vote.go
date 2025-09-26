@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"polling-service/services"
+	"polling-service/internal"
 )
 
 type Vote struct {
@@ -13,12 +13,12 @@ type Vote struct {
 }
 
 type VoteHandler struct {
-	voteService *services.VoteService
+	voteCaster internal.VoteCaster
 }
 
-func NewVoteHandler(service *services.VoteService) *VoteHandler {
+func NewVoteHandler(voteCaster internal.VoteCaster) *VoteHandler {
 	return &VoteHandler{
-		voteService: service,
+		voteCaster: voteCaster,
 	}
 }
 
@@ -39,7 +39,7 @@ func (h *VoteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.voteService.CastVote(vote.Option); err != nil {
+	if err := h.voteCaster.CastVote(vote.Option); err != nil {
 		log.Printf("Failed to cast vote: %s", err)
 		http.Error(w, "Failed to process vote", http.StatusInternalServerError)
 		return
