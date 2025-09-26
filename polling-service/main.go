@@ -11,6 +11,7 @@ import (
 
 	"poll/common/rabbitmq"
 	"polling-service/handlers"
+	"polling-service/services"
 )
 
 func main() {
@@ -42,9 +43,10 @@ func main() {
 		log.Fatalf("Failed to declare a queue: %s", err)
 	}
 
-	// Set up HTTP server.
+	// Set up services and handlers
 	server := &http.Server{}
-	voteHandler := handlers.NewVoteHandler(ch, queueName)
+	voteService := services.NewVoteService(ch, queueName)
+	voteHandler := handlers.NewVoteHandler(voteService)
 	http.Handle("/vote", voteHandler)
 
 	port := os.Getenv("PORT")

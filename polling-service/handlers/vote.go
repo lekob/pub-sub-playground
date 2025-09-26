@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"sync"
 
-	amqp "github.com/rabbitmq/amqp091-go"
+	"polling-service/services"
 )
 
 type Vote struct {
@@ -14,15 +13,12 @@ type Vote struct {
 }
 
 type VoteHandler struct {
-	amqpChannel  *amqp.Channel
-	amqpQueue    string
-	channelMutex sync.Mutex
+	voteService *services.VoteService
 }
 
-func NewVoteHandler(ch *amqp.Channel, queue string) *VoteHandler {
+func NewVoteHandler(service *services.VoteService) *VoteHandler {
 	return &VoteHandler{
-		amqpChannel: ch,
-		amqpQueue:   queue,
+		voteService: service,
 	}
 }
 
@@ -43,21 +39,8 @@ func (h *VoteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.channelMutex.Lock()
-	defer h.channelMutex.Unlock()
-
-	err := h.amqpChannel.Publish(
-		"",
-		h.amqpQueue,
-		false,
-		false,
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(vote.Option),
-		},
-	)
-	if err != nil {
-		log.Printf("Failed to publish a message: %s", err)
+	if err := h.voteService.CastVote(vote.Option); err != nil {
+		log.Printf("Failed to cast vote: %s", err)
 		http.Error(w, "Failed to process vote", http.StatusInternalServerError)
 		return
 	}
