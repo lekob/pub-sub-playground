@@ -51,16 +51,21 @@ func (h *hub) Run() {
 			}
 			h.mu.Unlock()
 		case message := <-h.broadcast:
+			// Make a copy of the clients map under the lock to avoid holding the
+			// lock during the potentially slow WriteMessage operation.
+			clientsToBroadcast := make([]Client, 0, len(h.clients))
 			h.mu.Lock()
 			for client := range h.clients {
-				err := client.WriteMessage(websocket.TextMessage, message)
-				if err != nil {
-					log.Printf("error: %v", err)
-					client.Close()
-					delete(h.clients, client)
-				}
+				clientsToBroadcast = append(clientsToBroadcast, client)
 			}
 			h.mu.Unlock()
+
+			for _, client := range clientsToBroadcast {
+				if err := client.WriteMessage(websocket.TextMessage, message); err != nil {
+					log.Printf("error writing to client: %v", err)
+					h.Unregister(client) // Use the unregister channel to handle cleanup
+				}
+			}
 		}
 	}
 }
