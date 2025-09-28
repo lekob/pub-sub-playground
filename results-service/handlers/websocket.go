@@ -19,11 +19,11 @@ var upgrader = websocket.Upgrader{
 // WebSocketHandler handles WebSocket connections for real-time vote updates
 type WebSocketHandler struct {
 	hub   *hub.Hub
-	store *store.Store
+	store store.VoteStore
 }
 
 // NewWebSocketHandler creates a new WebSocketHandler instance
-func NewWebSocketHandler(h *hub.Hub, s *store.Store) *WebSocketHandler {
+func NewWebSocketHandler(h *hub.Hub, s store.VoteStore) *WebSocketHandler {
 	return &WebSocketHandler{hub: h, store: s}
 }
 

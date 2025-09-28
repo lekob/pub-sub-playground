@@ -13,12 +13,12 @@ import (
 )
 
 type Consumer struct {
-	store *store.Store
+	store store.VoteStore
 	hub   *hub.Hub
 	conn  *amqp.Connection
 }
 
-func New(s *store.Store, h *hub.Hub, c *amqp.Connection) *Consumer {
+func New(s store.VoteStore, h *hub.Hub, c *amqp.Connection) *Consumer {
 	return &Consumer{store: s, hub: h, conn: c}
 }
 

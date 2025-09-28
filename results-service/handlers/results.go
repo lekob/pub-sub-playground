@@ -8,11 +8,11 @@ import (
 
 // ResultsHandler handles HTTP requests for vote results
 type ResultsHandler struct {
-	store *store.Store
+	store store.VoteStore
 }
 
 // NewResultsHandler creates a new ResultsHandler instance
-func NewResultsHandler(s *store.Store) *ResultsHandler {
+func NewResultsHandler(s store.VoteStore) *ResultsHandler {
 	return &ResultsHandler{store: s}
 }
 
