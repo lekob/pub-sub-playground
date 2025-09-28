@@ -14,11 +14,11 @@ import (
 
 type Consumer struct {
 	store store.VoteStore
-	hub   *hub.Hub
+	hub   hub.MessageBroadcaster
 	conn  *amqp.Connection
 }
 
-func New(s store.VoteStore, h *hub.Hub, c *amqp.Connection) *Consumer {
+func New(s store.VoteStore, h hub.MessageBroadcaster, c *amqp.Connection) *Consumer {
 	return &Consumer{store: s, hub: h, conn: c}
 }
 
@@ -82,7 +82,7 @@ func (c *Consumer) processMessages(msgs <-chan amqp.Delivery) {
 		}
 
 		if update, err := json.Marshal(counts); err == nil {
-			c.hub.Broadcast <- update
+			c.hub.Broadcast(update)
 		}
 	}
 

@@ -18,12 +18,12 @@ var upgrader = websocket.Upgrader{
 
 // WebSocketHandler handles WebSocket connections for real-time vote updates
 type WebSocketHandler struct {
-	hub   *hub.Hub
+	hub   hub.ClientManager
 	store store.VoteStore
 }
 
 // NewWebSocketHandler creates a new WebSocketHandler instance
-func NewWebSocketHandler(h *hub.Hub, s store.VoteStore) *WebSocketHandler {
+func NewWebSocketHandler(h hub.ClientManager, s store.VoteStore) *WebSocketHandler {
 	return &WebSocketHandler{hub: h, store: s}
 }
 
@@ -34,10 +34,12 @@ func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	h.hub.Register <- conn
+
+	client := hub.NewWebsocketClient(conn)
+	h.hub.Register(client)
 
 	defer func() {
-		h.hub.Unregister <- conn
+		h.hub.Unregister(client)
 	}()
 
 	// Send initial vote counts
@@ -46,13 +48,13 @@ func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to get initial vote counts: %s", err)
 	} else {
 		if initialJSON, err := json.Marshal(counts); err == nil {
-			conn.WriteMessage(websocket.TextMessage, initialJSON)
+			client.WriteMessage(websocket.TextMessage, initialJSON)
 		}
 	}
 
 	// Keep the connection alive until an error occurs
 	for {
-		if _, _, err := conn.NextReader(); err != nil {
+		if _, _, err := client.ReadMessage(); err != nil {
 			break
 		}
 	}

@@ -7,38 +7,50 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Hub struct {
-	clients    map[*websocket.Conn]bool
-	Broadcast  chan []byte
-	Register   chan *websocket.Conn
-	Unregister chan *websocket.Conn
+type hub struct {
+	clients    map[Client]bool
+	broadcast  chan []byte
+	register   chan Client
+	unregister chan Client
 	mu         sync.Mutex
 }
 
-func New() *Hub {
-	return &Hub{
-		clients:    make(map[*websocket.Conn]bool),
-		Broadcast:  make(chan []byte),
-		Register:   make(chan *websocket.Conn),
-		Unregister: make(chan *websocket.Conn),
+func New() Broadcaster {
+	return &hub{
+		broadcast:  make(chan []byte),
+		register:   make(chan Client),
+		unregister: make(chan Client),
+		clients:    make(map[Client]bool),
 	}
 }
 
-func (h *Hub) Run() {
+func (h *hub) Register(client Client) {
+	h.register <- client
+}
+
+func (h *hub) Unregister(client Client) {
+	h.unregister <- client
+}
+
+func (h *hub) Broadcast(message []byte) {
+	h.broadcast <- message
+}
+
+func (h *hub) Run() {
 	for {
 		select {
-		case client := <-h.Register:
+		case client := <-h.register:
 			h.mu.Lock()
 			h.clients[client] = true
 			h.mu.Unlock()
-		case client := <-h.Unregister:
+		case client := <-h.unregister:
 			h.mu.Lock()
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				client.Close()
 			}
 			h.mu.Unlock()
-		case message := <-h.Broadcast:
+		case message := <-h.broadcast:
 			h.mu.Lock()
 			for client := range h.clients {
 				err := client.WriteMessage(websocket.TextMessage, message)

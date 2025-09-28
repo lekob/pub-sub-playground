@@ -32,18 +32,21 @@ func main() {
 		log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 	}
 	var voteStore store.VoteStore = store.NewRedisVoteStore(redisClient)
-	wsHub := hub.New()
-	go wsHub.Run()
+	broadcaster := hub.New()
+	go broadcaster.Run()
+
+	var messageBroadcaster hub.MessageBroadcaster = broadcaster
+	var clientManager hub.ClientManager = broadcaster
 
 	// Start the RabbitMQ consumer
-	voteConsumer := consumer.New(voteStore, wsHub, amqp)
+	voteConsumer := consumer.New(voteStore, messageBroadcaster, amqp)
 	if err := voteConsumer.Start(); err != nil {
 		log.Fatalf("Failed to start vote consumer: %s", err)
 	}
 
 	// Initialize handlers
 	resultsHandler := handlers.NewResultsHandler(voteStore)
-	wsHandler := handlers.NewWebSocketHandler(wsHub, voteStore)
+	wsHandler := handlers.NewWebSocketHandler(clientManager, voteStore)
 	http.Handle("/results", resultsHandler)
 	http.Handle("/ws", wsHandler)
 
