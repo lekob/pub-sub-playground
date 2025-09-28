@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -9,7 +10,7 @@ import (
 )
 
 // Connect establishes a connection to Redis and returns the client object.
-func Connect() *redis.Client {
+func Connect() (*redis.Client, error) {
 	redisURL := os.Getenv("REDIS_URL")
 	if redisURL == "" {
 		redisURL = "localhost:6379"
@@ -19,9 +20,9 @@ func Connect() *redis.Client {
 	})
 
 	if _, err := rdb.Ping(context.Background()).Result(); err != nil {
-		log.Fatalf("Could not connect to Redis: %s", err)
+		return nil, fmt.Errorf("could not ping Redis: %w", err)
 	}
 
 	log.Println("Successfully connected to Redis")
-	return rdb
+	return rdb, nil
 }

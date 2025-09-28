@@ -10,7 +10,7 @@ import (
 )
 
 // Connect establishes a connection to RabbitMQ and returns the connection object.
-func Connect() *amqp.Connection {
+func Connect() (*amqp.Connection, error) {
 	amqpURL := os.Getenv("RABBITMQ_URL")
 	if amqpURL == "" {
 		amqpURL = "amqp://guest:guest@localhost:5672/"
@@ -19,14 +19,14 @@ func Connect() *amqp.Connection {
 	var connection *amqp.Connection
 	var err error
 	for range 5 {
-		connection, err = amqp.Dial(amqpURL)
-		if err == nil {
+		if connection, err = amqp.Dial(amqpURL); err == nil {
 			log.Println("Successfully connected to RabbitMQ")
-			return connection
+			return connection, nil
 		}
 		log.Printf("Failed to connect to RabbitMQ. Retrying in 5 seconds...")
 		time.Sleep(5 * time.Second)
 	}
 
-	panic(fmt.Sprintf("Could not connect to RabbitMQ: %s", err))
+	// After all retries, return a descriptive error wrapping the last underlying error.
+	return nil, fmt.Errorf("could not connect to RabbitMQ after multiple retries: %w", err)
 }

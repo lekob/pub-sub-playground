@@ -20,11 +20,17 @@ import (
 
 func main() {
 	// Initialize Redis client
-	redisClient := redis.Connect()
+	redisClient, err := redis.Connect()
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %s", err)
+	}
 	defer redisClient.Close()
 
 	// Initialize components
-	amqp := rabbitmq.Connect()
+	amqp, err := rabbitmq.Connect()
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+	}
 	voteStore := store.New(redisClient)
 	wsHub := hub.New()
 	go wsHub.Run()
