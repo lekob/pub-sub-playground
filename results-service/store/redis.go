@@ -7,23 +7,23 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// RedisVoteStore handles all Redis operations
-type RedisVoteStore struct {
+// RedisStore handles all Redis operations for the vote store.
+type RedisStore struct {
 	client *redis.Client
 }
 
-// NewRedisVoteStore creates a new Store instance
-func NewRedisVoteStore(client *redis.Client) *RedisVoteStore {
-	return &RedisVoteStore{client: client}
+// NewRedisStore creates a new Store instance.
+func NewRedisStore(client *redis.Client) *RedisStore {
+	return &RedisStore{client: client}
 }
 
 // IncrementVote increments the vote count for an option
-func (s *RedisVoteStore) IncrementVote(ctx context.Context, option string) error {
+func (s *RedisStore) IncrementVote(ctx context.Context, option string) error {
 	return s.client.Incr(ctx, option).Err()
 }
 
 // GetVoteCounts returns all vote counts
-func (s *RedisVoteStore) GetVoteCounts(ctx context.Context) (map[string]int, error) {
+func (s *RedisStore) GetVoteCounts(ctx context.Context) (map[string]int, error) {
 	keys, err := s.client.Keys(ctx, "*").Result()
 	if err != nil {
 		return nil, err

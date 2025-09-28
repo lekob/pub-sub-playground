@@ -31,7 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 	}
-	var voteStore store.VoteStore = store.NewRedisVoteStore(redisClient)
+	var voteStore store.VoteStore = store.NewRedisStore(redisClient)
 	broadcaster := hub.New()
 	go broadcaster.Run()
 
