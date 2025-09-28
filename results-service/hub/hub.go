@@ -8,7 +8,7 @@ import (
 )
 
 type Hub struct {
-	Clients    map[*websocket.Conn]bool
+	clients    map[*websocket.Conn]bool
 	Broadcast  chan []byte
 	Register   chan *websocket.Conn
 	Unregister chan *websocket.Conn
@@ -17,10 +17,10 @@ type Hub struct {
 
 func New() *Hub {
 	return &Hub{
+		clients:    make(map[*websocket.Conn]bool),
 		Broadcast:  make(chan []byte),
 		Register:   make(chan *websocket.Conn),
 		Unregister: make(chan *websocket.Conn),
-		Clients:    make(map[*websocket.Conn]bool),
 	}
 }
 
@@ -29,23 +29,23 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.Register:
 			h.mu.Lock()
-			h.Clients[client] = true
+			h.clients[client] = true
 			h.mu.Unlock()
 		case client := <-h.Unregister:
 			h.mu.Lock()
-			if _, ok := h.Clients[client]; ok {
-				delete(h.Clients, client)
+			if _, ok := h.clients[client]; ok {
+				delete(h.clients, client)
 				client.Close()
 			}
 			h.mu.Unlock()
 		case message := <-h.Broadcast:
 			h.mu.Lock()
-			for client := range h.Clients {
+			for client := range h.clients {
 				err := client.WriteMessage(websocket.TextMessage, message)
 				if err != nil {
 					log.Printf("error: %v", err)
 					client.Close()
-					delete(h.Clients, client)
+					delete(h.clients, client)
 				}
 			}
 			h.mu.Unlock()
