@@ -23,15 +23,15 @@ func (s *Store) IncrementVote(ctx context.Context, option string) error {
 }
 
 // GetVoteCounts returns all vote counts
-func (s *Store) GetVoteCounts(ctx context.Context) (map[string]int64, error) {
+func (s *Store) GetVoteCounts(ctx context.Context) (map[string]int, error) {
 	keys, err := s.client.Keys(ctx, "*").Result()
 	if err != nil {
 		return nil, err
 	}
 
-	counts := make(map[string]int64)
+	counts := make(map[string]int)
 	for _, key := range keys {
-		val, err := s.client.Get(ctx, key).Int64()
+		val, err := s.client.Get(ctx, key).Int()
 		if err != nil {
 			log.Printf("Failed to get value for key %s: %s", key, err)
 			continue
