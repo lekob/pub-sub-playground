@@ -15,7 +15,7 @@ type hub struct {
 	mu         sync.Mutex
 }
 
-func New() Broadcaster {
+func New() Hub {
 	return &hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan Client),

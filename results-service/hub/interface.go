@@ -25,9 +25,9 @@ type MessageBroadcaster interface {
 	Broadcast(message []byte)
 }
 
-// Broadcaster defines the complete interface for the WebSocket message hub.
+// Hub defines the complete interface for the WebSocket message hub.
 // It combines running, client management, and message broadcasting.
-type Broadcaster interface {
+type Hub interface {
 	Runnable
 	ClientManager
 	MessageBroadcaster
