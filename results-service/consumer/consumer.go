@@ -22,12 +22,11 @@ func New(s *store.Store, h *hub.Hub, c *amqp.Connection) *Consumer {
 	return &Consumer{store: s, hub: h, conn: c}
 }
 
-func (c *Consumer) Start() {
+func (c *Consumer) Start() error {
 	ch, err := c.conn.Channel()
 	if err != nil {
-		log.Fatalf("Failed to open a channel: %s", err)
+		return err
 	}
-	defer ch.Close()
 
 	queueName := "votes"
 	if qn := os.Getenv("RABBITMQ_QUEUE"); qn != "" {
@@ -43,7 +42,7 @@ func (c *Consumer) Start() {
 		nil,
 	)
 	if err != nil {
-		log.Fatalf("Failed to declare a queue: %s", err)
+		return err
 	}
 
 	msgs, err := ch.Consume(
@@ -56,9 +55,15 @@ func (c *Consumer) Start() {
 		nil,
 	)
 	if err != nil {
-		log.Fatalf("Failed to register a consumer: %s", err)
+		return err
 	}
 
+	go c.processMessages(msgs)
+
+	return nil
+}
+
+func (c *Consumer) processMessages(msgs <-chan amqp.Delivery) {
 	ctx := context.Background()
 	log.Println("RabbitMQ consumer started. Waiting for votes...")
 	for d := range msgs {
@@ -80,4 +85,8 @@ func (c *Consumer) Start() {
 			c.hub.Broadcast <- update
 		}
 	}
+
+	// If the loop exits, it means the channel was closed. This is a fatal
+	// state for the service, so we should log it and exit.
+	log.Fatalf("RabbitMQ consumer channel closed. Shutting down.")
 }

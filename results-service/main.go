@@ -37,7 +37,9 @@ func main() {
 
 	// Start the RabbitMQ consumer
 	voteConsumer := consumer.New(voteStore, wsHub, amqp)
-	go voteConsumer.Start()
+	if err := voteConsumer.Start(); err != nil {
+		log.Fatalf("Failed to start vote consumer: %s", err)
+	}
 
 	// Initialize handlers
 	resultsHandler := handlers.NewResultsHandler(voteStore)
