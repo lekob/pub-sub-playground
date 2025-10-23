@@ -2,24 +2,6 @@
 
 This project is a real-time polling application built with Go and a microservices architecture. It demonstrates the use of RabbitMQ for asynchronous communication between services and Redis for data persistence.
 
-## Architecture
-
-The application consists of two main services, a message broker, and a database:
-
--   **`polling-service`**: A Go service that exposes an HTTP endpoint to cast votes. When a vote is received, it publishes a message to a RabbitMQ queue.
--   **`results-service`**: A Go service that consumes vote messages from the RabbitMQ queue, stores the results in a Redis database, and broadcasts the updated results to connected clients in real-time using WebSockets.
--   **`rabbitmq`**: A RabbitMQ message broker that decouples the `polling-service` from the `results-service`.
--   **`redis`**: A Redis database used to store and persist the vote counts.
-
-## Services
-
-| Service           | Port (Host) | Description                                                                                                                             |
-| ----------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `polling-service` | `8080`      | Handles incoming votes and publishes them to the message queue.                                                                         |
-| `results-service` | `8081`      | Consumes votes, updates the database, and broadcasts results via WebSockets. Also provides an HTTP endpoint to get the current results. |
-| `rabbitmq`        | `15672`     | RabbitMQ management interface.                                                                                                          |
-| `redis`           | `6379`      | Redis database port.                                                                                                                    |
-
 ## Getting Started
 
 To run the application, you need to have Docker and Docker Compose installed.
@@ -36,17 +18,6 @@ To run the application, you need to have Docker and Docker Compose installed.
     ```bash
     make
     ```
-
-## Shared Dockerfile
-
-This repository uses a single multi-stage Dockerfile for both `polling-service` and `results-service`.
-
-To build a specific service with Docker directly, pass the `SERVICE_DIR` build-arg, for example:
-
-```bash
-docker build --build-arg SERVICE_DIR=polling-service .
-docker build --build-arg SERVICE_DIR=results-service .
-```
 
 ## Usage
 
@@ -102,3 +73,32 @@ There are two ways to view the results:
       ```
 
     - The interface will automatically connect to the WebSocket server and display the poll results dynamically.
+
+## Architecture
+
+The application consists of two main services, a message broker, and a database:
+
+-   **`polling-service`**: A Go service that exposes an HTTP endpoint to cast votes. When a vote is received, it publishes a message to a RabbitMQ queue.
+-   **`results-service`**: A Go service that consumes vote messages from the RabbitMQ queue, stores the results in a Redis database, and broadcasts the updated results to connected clients in real-time using WebSockets.
+-   **`rabbitmq`**: A RabbitMQ message broker that decouples the `polling-service` from the `results-service`.
+-   **`redis`**: A Redis database used to store and persist the vote counts.
+
+## Services
+
+| Service           | Port (Host) | Description                                                                                                                             |
+| ----------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `polling-service` | `8080`      | Handles incoming votes and publishes them to the message queue.                                                                         |
+| `results-service` | `8081`      | Consumes votes, updates the database, and broadcasts results via WebSockets. Also provides an HTTP endpoint to get the current results. |
+| `rabbitmq`        | `15672`     | RabbitMQ management interface.                                                                                                          |
+| `redis`           | `6379`      | Redis database port.                                                                                                                    |
+
+## Shared Dockerfile
+
+This repository uses a single multi-stage Dockerfile for both `polling-service` and `results-service`.
+
+To build a specific service with Docker directly, pass the `SERVICE_DIR` build-arg, for example:
+
+```bash
+docker build --build-arg SERVICE_DIR=polling-service .
+docker build --build-arg SERVICE_DIR=results-service .
+```
